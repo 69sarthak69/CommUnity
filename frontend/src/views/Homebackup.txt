@@ -1,0 +1,333 @@
+<script setup lang="ts">
+    import { ref, computed } from 'vue'
+    import { useRouter } from 'vue-router'
+    
+    // Simulating authentication check
+    const isAuthenticated = ref(false) // Change this logic based on your auth system
+    const router = useRouter()
+    
+    // Dummy data for posts
+    const posts = ref([
+      {
+        id: 1,
+        author: 'John D.',
+        location: 'Downtown',
+        time: '2 hours ago',
+        content: 'Looking for recommendations for a reliable plumber in the area. Any suggestions would be appreciated!',
+        likes: 5,
+        comments: 3
+      },
+      {
+        id: 2,
+        author: 'Sarah M.',
+        location: 'Westside',
+        time: '4 hours ago',
+        content: 'Lost cat in the neighborhood! Orange tabby with white paws. Please contact if seen.',
+        likes: 12,
+        comments: 8
+      }
+    ])
+    </script>
+    
+    <template>
+      <div v-if="isAuthenticated">
+        <!-- Authenticated User Homepage -->
+        <div class="nav-container">
+          <div class="container nav-content">
+            <router-link to="/" class="logo">Community Help</router-link>
+            <div class="nav-links">
+              <router-link to="/login" class="button-primary">Login</router-link>
+              <button class="button-secondary" @click="router.push('/chatbox')">💬 Chat</button>
+            </div>
+          </div>
+        </div>
+    
+        <div class="container main-content">
+          <aside class="sidebar">
+            <router-link to="/" class="sidebar-link">Home</router-link>
+            <router-link to="/tasks" class="sidebar-link">Tasks</router-link>
+            <router-link to="/groups" class="sidebar-link">Groups</router-link>
+            <router-link to="/events" class="sidebar-link">Events</router-link>
+            <router-link to="/notifications" class="sidebar-link">Notifications</router-link>
+          </aside>
+    
+          <main class="feed">
+            <div class="post-card">
+              <div class="post-header">
+                <button class="button-primary" @click="router.push('/post')">
+                  Ask for Help
+                </button>
+              </div>
+            </div>
+    
+            <div v-for="post in posts" :key="post.id" class="post-card">
+              <div class="post-header">
+                <div class="post-author">
+                  <div class="author-avatar">
+                    {{ post.author[0] }}
+                  </div>
+                  <div class="author-info">
+                    <span class="author-name">{{ post.author }}</span>
+                    <span class="post-meta">{{ post.location }} • {{ post.time }}</span>
+                  </div>
+                </div>
+              </div>
+    
+              <div class="post-content">
+                {{ post.content }}
+              </div>
+    
+              <div class="post-actions">
+                <button class="action-button">👍 {{ post.likes }}</button>
+                <button class="action-button">💬 {{ post.comments }}</button>
+                <button class="action-button">Share</button>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    
+      <!-- Public Homepage (If Not Logged In) -->
+      <div v-else>
+        <div class="public-homepage">
+          <header>
+            <h1>Welcome to CommUnity</h1>
+            <p>Join us in creating a supportive community</p>
+            <router-link to="/signup" class="button-primary">Join Now</router-link>
+          </header>
+    
+          <section class="why-community">
+            <h2>Why CommUnity?</h2>
+            <p>A platform that connects people to help each other</p>
+            <router-link to="/about" class="button-secondary">Learn More</router-link>
+          </section>
+    
+          <section class="features">
+            <h2>Key Features</h2>
+            <div class="feature-list">
+              <div class="feature-card">
+                <h3>Task Matching</h3>
+                <p>Connect with others who need help</p>
+              </div>
+              <div class="feature-card">
+                <h3>Real-Time Chat</h3>
+                <p>Instant communication with volunteers</p>
+              </div>
+              <div class="feature-card">
+                <h3>Emergency Assistance</h3>
+                <p>Get urgent help when you need it</p>
+              </div>
+              <div class="feature-card">
+                <h3>Donations</h3>
+                <p>Support causes and initiatives</p>
+              </div>
+            </div>
+          </section>
+    
+          <section class="volunteers">
+            <h2>Volunteers</h2>
+            <div class="volunteer-list">
+              <div class="volunteer-card">
+                <span>😊</span>
+                <p>John Doe</p>
+                <small>Community Member</small>
+                <blockquote>CommUnity has truly made a difference in my life</blockquote>
+              </div>
+              <div class="volunteer-card">
+                <span>😃</span>
+                <p>Jane Smith</p>
+                <small>Volunteer</small>
+                <blockquote>I feel fulfilled helping others through CommUnity</blockquote>
+              </div>
+              <div class="volunteer-card">
+                <span>👍</span>
+                <p>Sam Johnson</p>
+                <small>Volunteer</small>
+                <blockquote>I'm grateful for the support I received here</blockquote>
+              </div>
+            </div>
+          </section>
+    
+          <section class="get-started">
+            <h2>Get Started</h2>
+            <p>Sign up now to start making a difference</p>
+            <form>
+              <input type="text" placeholder="Enter your name" />
+              <input type="email" placeholder="Enter your email" />
+              <button class="button-primary">Sign Up</button>
+            </form>
+          </section>
+    
+          <footer>
+            <router-link to="/privacy">Privacy Policy</router-link>
+            <router-link to="/terms">Terms of Service</router-link>
+          </footer>
+        </div>
+      </div>
+    </template>
+    
+    <style scoped>
+    /* Basic styling */
+    .public-homepage {
+      text-align: center;
+      padding: 20px;
+    }
+    
+    .button-primary {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+    
+    .button-secondary {
+      display: inline-block;
+      padding: 8px 18px;
+      background-color: #6c757d;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+    
+    .feature-list {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .feature-card {
+      width: 200px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+    
+    .volunteer-list {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .volunteer-card {
+      width: 220px;
+      padding: 15px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .get-started form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .get-started input {
+      padding: 8px;
+      margin: 5px 0;
+      width: 80%;
+      max-width: 300px;
+    }
+    
+    footer {
+      margin-top: 20px;
+    }
+    </style>
+    
+
+
+
+
+
+    ''''''''''''
+    <script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
+
+const router = useRouter()
+const name = ref('')
+const email = ref('')
+const password = ref('')
+const errorMessage = ref('')
+const successMessage = ref('')
+
+const handleRegister = async () => {
+  errorMessage.value = ''
+  successMessage.value = ''
+  
+  try {
+    await axios.post('http://localhost:8000/api/auth/register/', {
+      username: name.value,
+      email: email.value,
+      password: password.value
+    })
+
+    successMessage.value = 'Registration successful! Redirecting to login...'
+    
+    // Redirect to login after 2 seconds
+    setTimeout(() => {
+      router.push('/login')
+    }, 2000)
+
+  } catch (error) {
+    errorMessage.value = error.response?.data?.email?.[0] || 'Registration failed'
+    console.error('Registration error:', errorMessage.value)
+  }
+}
+</script>
+
+<template>
+  <div class="form-container">
+    <h2 class="form-title">Join Community Help</h2>
+
+    <form @submit.prevent="handleRegister">
+      <div class="form-group">
+        <label for="name" class="form-label">Full Name</label>
+        <input id="name" type="text" v-model="name" required class="form-input" placeholder="Enter your full name" />
+      </div>
+
+      <div class="form-group">
+        <label for="email" class="form-label">Email</label>
+        <input id="email" type="email" v-model="email" required class="form-input" placeholder="Enter your email" />
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <input id="password" type="password" v-model="password" required class="form-input" placeholder="Create a password" />
+      </div>
+
+      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+      <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
+
+      <button type="submit" class="button-primary" style="width: 100%">
+        Join Community Help
+      </button>
+    </form>
+
+    <div class="form-footer">
+      <p>
+        Already have an account? <router-link to="/login">Log in</router-link>
+      </p>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.error-message {
+  color: red;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+.success-message {
+  color: green;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+</style>
