@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import GroupChat from '../components/GroupChat.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -106,6 +107,11 @@ onMounted(fetchGroup)
         <!-- Join Button -->
         <div v-else-if="!group.members.includes(currentUserId)" class="mt-4">
           <button class="button-primary" @click="joinGroup">➕ Join Group</button>
+        </div>
+
+        <!-- ✅ Chatbox for group members -->
+        <div v-else class="mt-8">
+          <GroupChat :userId="currentUserId" roomType="group" :roomId="group.id" />
         </div>
       </div>
 

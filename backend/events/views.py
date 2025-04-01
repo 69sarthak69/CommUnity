@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from .models import Event
 from .serializers import EventSerializer
+from chat.models import Room 
 
 # ✅ List + Create Events
 class EventListCreateView(generics.ListCreateAPIView):
@@ -15,6 +16,9 @@ class EventListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         event = serializer.save(created_by=self.request.user)
         event.attendees.add(self.request.user)  # ✅ Auto-join creator
+        room_name = f"event_{event.id}"
+        Room.objects.get_or_create(name=room_name)
+
 
 
 # ✅ Get event detail
@@ -31,6 +35,7 @@ def event_detail(request, event_id):
 
 
 # ✅ RSVP (Join) Event
+# ✅ RSVP (Join) Event
 class EventJoinView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -40,11 +45,12 @@ class EventJoinView(APIView):
         except Event.DoesNotExist:
             return Response({'error': 'Event not found'}, status=404)
 
-        if request.user in event.attendees.all():
+        if request.user in event.attendees.all():  # ✅ fix: use attendees not members
             return Response({'message': 'Already joined'}, status=200)
 
-        event.attendees.add(request.user)
+        event.attendees.add(request.user)  # ✅ fix: use attendees
         return Response({'message': 'Joined event successfully'}, status=200)
+
 
 
 # ✅ Cancel RSVP
@@ -57,9 +63,10 @@ class CancelRSVPView(APIView):
         except Event.DoesNotExist:
             return Response({'error': 'Event not found'}, status=404)
 
-        if request.user in event.attendees.all():
-            event.attendees.remove(request.user)
+        if request.user in event.members.all():
+            event.members.remove(request.user)
             return Response({'message': 'RSVP cancelled'}, status=200)
+
         return Response({'message': 'You were not attending'}, status=400)
 
 

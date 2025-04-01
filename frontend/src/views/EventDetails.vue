@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import EventChat from '../components/EventChat.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -85,7 +86,6 @@ onMounted(fetchEvent)
 
 <template>
   <div class="container main-content">
-    <!-- ✅ Sidebar Navigation -->
     <aside class="sidebar">
       <router-link to="/home" class="sidebar-link">Home</router-link>
       <router-link to="/groups" class="sidebar-link">Groups</router-link>
@@ -93,7 +93,6 @@ onMounted(fetchEvent)
       <router-link to="/notifications" class="sidebar-link">Notifications</router-link>
       <router-link to="/donations" class="sidebar-link">🎁 Donations</router-link>
     </aside>
-
 
     <div v-if="isLoading">Loading event...</div>
 
@@ -119,6 +118,11 @@ onMounted(fetchEvent)
         <button v-else class="button-secondary" @click="cancelRSVP">
           ❌ Cancel RSVP
         </button>
+      </div>
+
+      <!-- ✅ Chat Component for attendees or creator -->
+      <div v-if="event.attendees.includes(currentUserId) || event.created_by === currentUserId" class="mt-8">
+        <EventChat :userId="currentUserId" roomType="event" :roomId="event.id" />
       </div>
     </div>
   </div>

@@ -6,6 +6,7 @@ from .models import Group
 from .serializers import GroupSerializer
 from .permissions import IsGroupAdmin
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from chat.models import Room 
 
 
 # ✅ List + Create Group (used on groups page)
@@ -17,6 +18,9 @@ class GroupListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         group = serializer.save(created_by=self.request.user)
         group.members.add(self.request.user)  # ✅ Add creator as member
+
+        room_name = f"group_{group.id}"
+        Room.objects.get_or_create(name=room_name)
 
 
 # ✅ Join Group (POST /api/groups/<id>/join/)
