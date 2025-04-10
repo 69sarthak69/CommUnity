@@ -1,85 +1,96 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref } from 'vue'
 
-const donations = ref([
-  {
-    id: 1,
-    donor: 'Emily R.',
-    location: 'Downtown',
-    time: '1 hour ago',
-    content: 'I have extra winter clothes in good condition. Let me know if anyone needs them!',
-    likes: 15,
-    comments: 4
-  },
-  {
-    id: 2,
-    donor: 'Michael T.',
-    location: 'Westside',
-    time: '3 hours ago',
-    content: 'Giving away a study desk and chair. Free for students in need!',
-    likes: 10,
-    comments: 2
-  },
-  {
-    id: 3,
-    donor: 'Olivia P.',
-    location: 'Eastside',
-    time: '5 hours ago',
-    content: 'Donating a grocery package for a family in need. Please reach out!',
-    likes: 18,
-    comments: 6
+const amount = ref('')
+
+const donate = async () => {
+  if (!amount.value || parseFloat(amount.value) < 10) {
+    alert('Minimum donation is Rs. 10')
+    return
   }
-]);
+
+  try {
+    const res = await fetch('http://127.0.0.1:8000/api/donation/initiate/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // 👇 Include auth ONLY if your backend needs it
+        Authorization: `Bearer ${localStorage.getItem('access')}`
+      },
+      body: JSON.stringify({ amount: amount.value })
+    })
+
+    const data = await res.json()
+
+    if (res.ok && data.payment_url) {
+      window.location.href = data.payment_url
+    } else {
+      console.error(data)
+      alert(' Failed to initiate payment')
+    }
+  } catch (err) {
+    console.error(err)
+    alert('Something went wrong')
+  }
+}
 </script>
 
 <template>
-    
-  <div class="container main-content">
-    <aside class="sidebar">
-      <router-link to="/home" class="sidebar-link">Home</router-link>
-      <router-link to="/groups" class="sidebar-link">Groups</router-link>
-      <router-link to="/events" class="sidebar-link">Events</router-link>
-      <router-link to="/notifications" class="sidebar-link">Notifications</router-link>
-      <router-link to="/donations" class="sidebar-link">🎁 Donations</router-link> <!-- NEW BUTTON -->
-    </aside>
-    <main class="feed">
-      <div class="post-card">
-        <div class="post-header">
-          <button class="button-primary">
-            Offer a Donation
-          </button>
-        </div>
-      </div>
+  <div class="donation-container">
+    <h2> Support the Community</h2>
 
-      <div v-for="donation in donations" :key="donation.id" class="post-card">
-        <div class="post-header">
-          <div class="post-author">
-            <div class="author-avatar">
-              {{ donation.donor[0] }}
-            </div>
-            <div class="author-info">
-              <span class="author-name">{{ donation.donor }}</span>
-              <span class="post-meta">{{ donation.location }} • {{ donation.time }}</span>
-            </div>
-          </div>
-        </div>
+    <div class="donation-box">
+      <label for="amount">Enter Donation Amount (Rs):</label>
+      <input
+        v-model="amount"
+        type="number"
+        id="amount"
+        placeholder="e.g. 500"
+      />
 
-        <div class="post-content">
-          {{ donation.content }}
-        </div>
-
-        <div class="post-actions">
-          <button class="action-button">
-            👍 {{ donation.likes }}
-          </button>
-          <button class="action-button">
-            💬 {{ donation.comments }}
-          </button>
-          <button class="action-button">
-            Share
-          </button>
-        </div>
-      </div>
-    </main>
+      <button @click="donate" class="button-primary">
+        Donate with Khalti
+      </button>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.donation-container {
+  max-width: 500px;
+  margin: 60px auto;
+  padding: 20px;
+  text-align: center;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+}
+
+.donation-box {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+input[type='number'] {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.button-primary {
+  padding: 12px;
+  font-size: 16px;
+  background-color: #5c2d91;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.button-primary:hover {
+  background-color: #4a1c7c;
+}
+</style>
