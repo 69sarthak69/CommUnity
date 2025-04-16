@@ -4,7 +4,6 @@ import NavBar from './views/NavBar.vue';
 </script>
 
 <template>
-  <NavBar/>
   
   <router-view />
   <Footer />

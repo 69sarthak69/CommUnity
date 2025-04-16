@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watchEffect } from 'vue'
+import { ref, computed, onMounted,  watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
+
 import Notifications from "../components/Notifications.vue"
+import '../style.css' 
 
 interface HelpRequest {
   id: number;
@@ -147,138 +149,225 @@ const handleLogout = () => {
 </script>
 
 <template>
-  <div class="nav-container">
-    <div class="container nav-content">
-      <router-link to="/" class="logo">Community Help</router-link>
-      <div class="nav-links">
+  <div class="app-container">
+    <!-- Top Navigation Bar -->
+    <nav class="navbar">
+  <div class="container nav-content">
+    <router-link to="/home" class="logo">
+      <span class="logo-icon">🤝</span>
+      <span>CommunityHelp</span>
+    </router-link>
+    
+    <div class="nav-links">
+      <!-- Notification Component -->
+      <div class="flex items-center">
         <Notifications />
-        <button class="button-secondary" @click="router.push('/profile')" v-if="user">
-          👤 {{ user?.email }}
-        </button>
-        <button class="button-secondary" @click="handleLogout" v-if="user">🚪 Logout</button>
-        <button class="button-secondary" @click="router.push('/chatbox')" v-if="user">💬 Chat</button>
-        <router-link to="/login" class="button-primary" v-if="!user">Login</router-link>
       </div>
+      
+      <button 
+        v-if="user"
+        class="nav-button"
+        @click="router.push('/profile')"
+      >
+        <span class="button-icon">👤</span>
+        <span class="button-text">{{ user.username || user.email }}</span>
+      </button>
+      
+      <button 
+        v-if="user"
+        class="nav-button"
+        @click="router.push('/chatbox')"
+      >
+        <span class="button-icon">💬</span>
+        <span class="button-text">Chat</span>
+      </button>
+      
+      <button 
+        v-if="user"
+        class="nav-button logout"
+        @click="handleLogout"
+      >
+        <span class="button-icon">🚪</span>
+        <span class="button-text">Logout</span>
+      </button>
+      
+      <router-link 
+        v-if="!user"
+        to="/login" 
+        class="nav-button primary"
+      >
+        <span class="button-text">Login</span>
+      </router-link>
     </div>
   </div>
+</nav>
 
-  <div class="container main-content">
-    <aside class="sidebar">
-      <router-link to="/home" class="sidebar-link">Home</router-link>
-      <router-link to="/groups" class="sidebar-link">Groups</router-link>
-      <router-link to="/events" class="sidebar-link">Events</router-link>
-      <router-link to="/notifications" class="sidebar-link">Notifications</router-link>
-      <router-link to="/donations" class="sidebar-link">🎁 Donations</router-link>
-      
-    </aside>
+    <div class="container main-content">
+      <!-- Left Sidebar -->
+      <aside class="sidebar">
+        <router-link to="/home" class="sidebar-link active">
+          <span class="link-icon">🏠</span>
+          <span>Home</span>
+        </router-link>
+        <router-link to="/groups" class="sidebar-link">
+          <span class="link-icon">👥</span>
+          <span>Groups</span>
+        </router-link>
+        <router-link to="/events" class="sidebar-link">
+          <span class="link-icon">📅</span>
+          <span>Events</span>
+        </router-link>
+        <router-link to="/notifications" class="sidebar-link">
+          <span class="link-icon">🔔</span>
+          <span>Notifications</span>
+        </router-link>
+        <router-link to="/donations" class="sidebar-link">
+          <span class="link-icon">🎁</span>
+          <span>Donations</span>
+        </router-link>
+      </aside>
 
-    <main class="feed">
-      <div class="tasks-header">
-        <h1 class="text-2xl font-bold">Community Help Requests</h1>
-        <button class="button-primary" @click="router.push('/post')">Create New Task</button>
-        <button class="button-secondary ml-2" @click="router.push('/create-post')">Create Community Post</button>
-      </div>
+      <!-- Main Content -->
+      <main class="feed">
+        <!-- Help Requests Section -->
+        <section class="section">
+          <div class="section-header">
+            <h1 class="section-title">Community Help Requests</h1>
+            <div class="action-buttons">
+              <button class="btn primary" @click="router.push('/post')">
+                <span class="btn-icon">+</span>
+                <span>Create Task</span>
+              </button>
+              <button class="btn secondary" @click="router.push('/create-post')">
+                <span class="btn-icon">✏️</span>
+                <span>Create Post</span>
+              </button>
+            </div>
+          </div>
 
-      <div class="task-filters">
-        <input
-          type="text"
-          v-model="searchQuery"
-          placeholder="Search tasks..."
-          class="form-input"
-          style="width: 300px"
-        />
-        <button 
-          v-for="filter in ['all', 'pending', 'accepted', 'completed']"
-          :key="filter"
-          :class="['filter-button', { active: activeFilter === filter }]"
-          @click="activeFilter = filter"
-        >
-          {{ filter.charAt(0).toUpperCase() + filter.slice(1) }}
-        </button>
-      </div>
+          <div class="filters">
+            <div class="search-container">
+              <span class="search-icon">🔍</span>
+              <input
+                type="text"
+                v-model="searchQuery"
+                placeholder="Search tasks..."
+                class="search-input"
+              />
+            </div>
+            <div class="filter-buttons">
+              <button 
+                v-for="filter in ['all', 'pending', 'accepted', 'completed']"
+                :key="filter"
+                :class="['filter-btn', { active: activeFilter === filter }]"
+                @click="activeFilter = filter"
+              >
+                {{ filter.charAt(0).toUpperCase() + filter.slice(1) }}
+              </button>
+            </div>
+          </div>
 
-      <div v-if="helpRequests.length === 0">
-        <p class="text-gray-500">No help requests available.</p>
-      </div>
+          <div v-if="helpRequests.length === 0" class="empty-state">
+            <span class="empty-icon">📭</span>
+            <p>No help requests available</p>
+          </div>
 
-      <div v-else>
-        <div v-for="request in filteredRequests" :key="request.id" class="post-card">
-          <div class="post-header">
-            <div class="post-author">
-              <div class="author-info">
-                <span class="author-name">{{ request.title }}</span>
-                <span class="post-meta">
-                  {{ request.location }} • {{ new Date(request.created_at).toLocaleDateString() }}
+          <div v-else class="cards-grid">
+            <div 
+              v-for="request in filteredRequests" 
+              :key="request.id" 
+              class="card"
+            >
+              <div class="card-header">
+                <div class="card-title">
+                  <h3>{{ request.title }}</h3>
+                  <div class="card-meta">
+                    <span>{{ request.location }}</span>
+                    <span class="dot">•</span>
+                    <span>{{ new Date(request.created_at).toLocaleDateString() }}</span>
+                  </div>
+                </div>
+                <div 
+                  :class="{
+                    'tag emergency': request.is_emergency,
+                    'tag regular': !request.is_emergency
+                  }"
+                >
+                  {{ request.is_emergency ? '🚨 Emergency' : '🟢 Regular' }}
+                </div>
+              </div>
+
+              <div class="card-content">
+                <p>{{ request.description }}</p>
+              </div>
+
+              <div class="card-footer">
+                <span class="category">{{ request.category }}</span>
+                <div class="card-actions">
+                  <button
+                    v-if="user && user.id === request.created_by"
+                    class="btn small"
+                    @click="router.push(`/help-request/${request.id}`)"
+                  >
+                    👁 View Applicants
+                  </button>
+                  <button
+                    v-else-if="user && !request.is_applied"
+                    class="btn small primary"
+                    @click="applyToHelp(request.id)"
+                  >
+                    🤝 Apply to Help
+                  </button>
+                  <span v-else class="applied-status">
+                    ✅ Applied
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Community Posts Section -->
+        <section class="section">
+          <h2 class="section-title">📣 Community Posts</h2>
+          
+          <div v-if="posts.length === 0" class="empty-state">
+            <span class="empty-icon">📭</span>
+            <p>No community posts available</p>
+          </div>
+
+          <div v-else class="cards-grid">
+            <div v-for="post in posts" :key="post.id" class="card post-card">
+              <div class="card-header">
+                <div class="card-title">
+                  <h3>{{ post.title }}</h3>
+                  <div class="card-meta">
+                    <span>{{ post.category }}</span>
+                    <span class="dot">•</span>
+                    <span>{{ new Date(post.created_at).toLocaleDateString() }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-content">
+                <p>{{ post.content }}</p>
+                <img
+                  v-if="post.image"
+                  :src="`http://127.0.0.1:8000${post.image}`"
+                  alt="Post Image"
+                  class="post-image"
+                />
+              </div>
+
+              <div class="card-footer">
+                <span class="location">
+                  📍 {{ post.location || 'Location not specified' }}
                 </span>
               </div>
             </div>
-            <span
-              :class="{
-                'bg-red-100 text-red-800': request.is_emergency,
-                'bg-green-100 text-green-800': !request.is_emergency
-              }"
-              class="px-2 py-1 rounded-full text-sm"
-            >
-              {{ request.is_emergency ? '🚨 Emergency' : 'Regular' }}
-            </span>
           </div>
-
-          <div class="post-content">{{ request.description }}</div>
-
-          <div class="post-actions space-x-4">
-            <span class="text-sm text-gray-600">Category: {{ request.category }}</span>
-
-            <button
-              v-if="user && user.id === request.created_by"
-              class="text-blue-600 font-medium"
-              @click="router.push(`/help-request/${request.id}`)"
-            >
-              👁 View Applicants
-            </button>
-
-            <button
-              v-else-if="user && !request.is_applied"
-              class="button-primary"
-              @click="applyToHelp(request.id)"
-            >
-              🤝 Apply to Help
-            </button>
-
-            <span v-else class="text-green-600 font-medium">✅ Already Applied</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="community-posts-section mt-10">
-        <h2 class="text-2xl font-bold mb-4">📣 Community Posts</h2>
-        <div v-if="posts.length === 0">
-          <p class="text-gray-500">No community posts available.</p>
-        </div>
-        <div v-else>
-          <div v-for="post in posts" :key="post.id" class="post-card mb-6 p-4 bg-white rounded shadow">
-            <div class="post-header mb-2">
-              <div class="author-info">
-                <h3 class="text-lg font-semibold">{{ post.title }}</h3>
-                <span class="text-sm text-gray-600">
-                  {{ post.category }} • {{ new Date(post.created_at).toLocaleDateString() }}
-                </span>
-              </div>
-            </div>
-            <div class="post-content mb-2">
-              <p>{{ post.content }}</p>
-            </div>
-            <img
-              v-if="post.image"
-              :src="`http://127.0.0.1:8000${post.image}`"
-              alt="Post Image"
-              class="w-full max-w-md rounded-lg mt-3"
-            />
-            <div class="post-meta text-sm text-gray-500 mt-2">
-              Location: {{ post.location || 'Not specified' }}
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
+        </section>
+      </main>
+    </div>
   </div>
 </template>

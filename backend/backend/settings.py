@@ -39,8 +39,11 @@ INSTALLED_APPS = [
     'notifications',
     'channels',
     'chat',
+    'donation',
     
 ]
+
+KHALTI_SECRET_KEY = "test_secret_key_18d538e7c1de4a528b974a05a6548a04"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

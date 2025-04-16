@@ -40,7 +40,7 @@ const handleLogout = () => {
  <!-- ✅ Top Navigation Bar -->
  <div class="nav-container">
     <div class="container nav-content">
-      <router-link to="/" class="logo">Community Help</router-link>
+      <router-link to="/home" class="logo">Community Help</router-link>
 
       <div class="nav-links">
         <!-- ✅ Notification Bell Icon -->

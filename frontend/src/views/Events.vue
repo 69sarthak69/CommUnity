@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -58,17 +58,111 @@ const getEventDay = (date: string) => {
 }
 
 onMounted(fetchEvents)
+
+const user = ref<{ email: string; username: string; id: number } | null>(null)
+
+const checkUser = () => {
+  const storedEmail = localStorage.getItem('user_email')
+  const storedUsername = localStorage.getItem('user_username')
+  const storedUserId = localStorage.getItem('user_id')
+
+  if (storedEmail && storedUsername && storedUserId) {
+    user.value = {
+      email: storedEmail,
+      username: storedUsername,
+      id: parseInt(storedUserId)
+    }
+  } else {
+    user.value = null
+  }
+}
+window.addEventListener('userLoggedIn', checkUser)
+watchEffect(() => {
+  checkUser()
+})
+const handleLogout = () => {
+  localStorage.removeItem('access_token')
+  localStorage.removeItem('user_email')
+  localStorage.removeItem('user_username')
+  localStorage.removeItem('user_id')
+  user.value = null
+  router.push('/login')
+}
 </script>
 
 <template>
+      <!-- Top Navigation Bar -->
+      <nav class="navbar">
+      <div class="container nav-content">
+        <router-link to="/" class="logo">
+          <span class="logo-icon">🤝</span>
+          <span>CommunityHelp</span>
+        </router-link>
+        
+        <div class="nav-links">
+          <Notifications />
+          
+          <button 
+            v-if="user"
+            class="nav-button"
+            @click="router.push('/profile')"
+          >
+            <span class="button-icon">👤</span>
+            <span class="button-text">{{ user.username || user.email }}</span>
+          </button>
+          
+          <button 
+            v-if="user"
+            class="nav-button"
+            @click="router.push('/chatbox')"
+          >
+            <span class="button-icon">💬</span>
+            <span class="button-text">Chat</span>
+          </button>
+          
+          <button 
+            v-if="user"
+            class="nav-button logout"
+            @click="handleLogout"
+          >
+            <span class="button-icon">🚪</span>
+            <span class="button-text">Logout</span>
+          </button>
+          
+          <router-link 
+            v-if="!user"
+            to="/login" 
+            class="nav-button primary"
+          >
+            <span class="button-text">Login</span>
+          </router-link>
+        </div>
+      </div>
+    </nav>
   <div class="container main-content">
-    <aside class="sidebar">
-      <router-link to="/home" class="sidebar-link">Home</router-link>
-      <router-link to="/groups" class="sidebar-link">Groups</router-link>
-      <router-link to="/events" class="sidebar-link">Events</router-link>
-      <router-link to="/notifications" class="sidebar-link">Notifications</router-link>
-      <router-link to="/donations" class="sidebar-link">🎁 Donations</router-link>
-    </aside>
+   <!-- Left Sidebar -->
+   <aside class="sidebar">
+        <router-link to="/home" class="sidebar-link ">
+          <span class="link-icon">🏠</span>
+          <span>Home</span>
+        </router-link>
+        <router-link to="/groups" class="sidebar-link ">
+          <span class="link-icon">👥</span>
+          <span>Groups</span>
+        </router-link>
+        <router-link to="/events" class="sidebar-link active">
+          <span class="link-icon">📅</span>
+          <span>Events</span>
+        </router-link>
+        <router-link to="/notifications" class="sidebar-link">
+          <span class="link-icon">🔔</span>
+          <span>Notifications</span>
+        </router-link>
+        <router-link to="/donations" class="sidebar-link">
+          <span class="link-icon">🎁</span>
+          <span>Donations</span>
+        </router-link>
+      </aside>
 
     <main class="feed">
       <div class="tasks-header">

@@ -1,25 +1,26 @@
 <template>
   <div class="relative">
-    <button @click="toggleDropdown" class="relative focus:outline-none">
-      <!-- Bell Icon -->🔔
-      <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-      </svg>
+    <button 
+      @click="toggleDropdown" 
+      class="relative focus:outline-none h-8 w-8 flex items-center justify-center"
+    >
+      <!-- Bell Icon -->
+      <span class="text-xl">🔔</span>
 
       <!-- Unread Count -->
       <span
         v-if="unreadCount > 0"
-        class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full px-1.5"
+        class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center"
       >
-        {{ unreadCount }}
+        {{ unreadCount > 9 ? '9+' : unreadCount }}
       </span>
     </button>
 
     <!-- Dropdown -->
     <div
       v-if="dropdownOpen"
-      class="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
+      ref="dropdownRef"
+      class="fixed right-4 top-16 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 transition-all duration-200"
     >
       <div class="p-4 text-sm font-medium text-gray-800 border-b">Notifications</div>
 
@@ -32,15 +33,15 @@
           v-for="notif in notifications"
           :key="notif.id"
           class="p-3 hover:bg-gray-50 transition cursor-pointer"
+          @click="markAsRead(notif.id)"
         >
-          <!-- 👇 Link to related object -->
           <router-link
             :to="getLink(notif)"
             class="flex items-center space-x-2"
           >
-            <span v-if="!notif.is_read" class="w-2 h-2 rounded-full bg-blue-500"></span>
-            <span v-else class="w-2 h-2"></span>
-            <span class="text-sm text-gray-700">{{ notif.message }}</span>
+            <span v-if="!notif.is_read" class="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0"></span>
+            <span v-else class="w-2 h-2 flex-shrink-0"></span>
+            <span class="text-sm text-gray-700 line-clamp-2">{{ notif.message }}</span>
           </router-link>
         </li>
       </ul>
@@ -49,9 +50,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted,onUnmounted, watch } from 'vue'
+import { onClickOutside } from '@vueuse/core'
 
 const dropdownOpen = ref(false)
+const dropdownRef = ref(null)
 const notifications = ref([])
 const unreadCount = ref(0)
 
@@ -93,5 +96,43 @@ const fetchNotifications = async () => {
   }
 }
 
+const markAsRead = async (id) => {
+  try {
+    await fetch(`http://127.0.0.1:8000/api/notifications/${id}/mark-read/`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    dropdownOpen.value = false
+    fetchNotifications()
+  } catch (err) {
+    console.error('Failed to mark notification as read', err)
+  }
+}
+
+// Close dropdown when clicking outside
+onClickOutside(dropdownRef, () => {
+  dropdownOpen.value = false
+})
+
+// Fetch notifications on mount
 onMounted(fetchNotifications)
+
+// Optional: Poll for new notifications every 30 seconds
+const pollInterval = setInterval(fetchNotifications, 30000)
+
+// Clean up interval when component unmounts
+onUnmounted(() => {
+  clearInterval(pollInterval)
+})
 </script>
+
+<style scoped>
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>
