@@ -9,38 +9,6 @@ const router = useRouter()
 const activeFilter = ref('all')
 const searchQuery = ref('')
 
-const tasks = ref([
-  {
-    id: 1,
-    title: 'Help with Grocery Shopping',
-    description: 'Need assistance with weekly grocery shopping for an elderly couple',
-    location: 'Downtown Area',
-    urgency: 'Normal',
-    status: 'Open',
-    date: '2024-03-20',
-    category: 'Shopping'
-  },
-  {
-    id: 2,
-    title: 'Emergency Medical Transport',
-    description: 'Transport needed for medical appointment',
-    location: 'North Side',
-    urgency: 'High',
-    status: 'In Progress',
-    date: '2024-03-19',
-    category: 'Transportation'
-  },
-  {
-    id: 3,
-    title: 'Garden Maintenance',
-    description: 'Help needed with basic garden maintenance for disabled person',
-    location: 'South Side',
-    urgency: 'Low',
-    status: 'Open',
-    date: '2024-03-21',
-    category: 'Maintenance'
-  }
-])
 
 const filteredTasks = computed(() => {
   return tasks.value.filter(task => {

@@ -3,7 +3,7 @@ from django.conf import settings
 
 class Room(models.Model):
     """One room per group or event"""
-    name = models.CharField(max_length=100, unique=True)  # ex: "group_5"
+    name = models.CharField(max_length=100, unique=True) 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

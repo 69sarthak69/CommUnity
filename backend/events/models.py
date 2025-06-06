@@ -7,8 +7,11 @@ class Event(models.Model):
     date = models.DateTimeField()
     location = models.CharField(max_length=255)
 
-    category = models.CharField(max_length=100, default="General")  # ✅ add default
-    created_at = models.DateTimeField(auto_now_add=True, null=True)  # ✅ this one is fine as-is
+    category = models.CharField(max_length=100, default="General")  
+    created_at = models.DateTimeField(auto_now_add=True, null=True)  
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+
 
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,

@@ -6,21 +6,29 @@ import Dashboard from '../views/Dashboard.vue'
 import Tasks from '../views/Tasks.vue'
 import Groups from '../views/Groups.vue'
 import Events from '../views/Events.vue'
-import AskForHelp from '../views/AskForHelp.vue'
+import AskForHelp from '../components/AskForHelp.vue'
 import ChatBox from '../views/ChatBox.vue'
 import Donations from '../views/Donations.vue'
-import CreateGroup from '../views/CreateGroup.vue'
-import CreateEvent from '../views/CreateEvent.vue'
+import CreateGroup from '../components/CreateGroup.vue'
+import CreateEvent from '../components/CreateEvent.vue'
 import HelpRequestDetail from '../views/HelpRequestDetail.vue'
 import Notifications from '../components/Notifications.vue'
+import ForgotPassword from '../views/ForgotPassword.vue'
+import ResetPassword from '../views/ResetPassword.vue'
+import DonateModal from '../components/DonateModal.vue'
+import InKindDonateModal from '../components/InKindDonateModal.vue'
+import CreateDonationModal from '../components/CreateDonationModal.vue'
+import MyApplication from '../views/MyApplication.vue'
+import Profile from '../views/Profile.vue'
 
 
 
 
 const routes = [
   { path: '/home', name: 'home', component: Home },
-  { path: '/login', name: 'login', component: Login },
+  { path: '/', name: 'login', component: Login },
   { path: '/register', name: 'register', component: Register },
+
   { path: '/groups', name: 'groups', component: Groups },
   { path: '/dashboard', name: 'dashboard', component: Dashboard, meta: { requiresAuth: true } },
   { path: '/events', name: 'events', component: Events, meta: { requiresAuth: true } },
@@ -53,6 +61,55 @@ const routes = [
     name: 'ChatRoom',
     component: () => import('../views/ChatRoom.vue')
   },
+  {
+    path: '/donations/success',
+    name: 'DonationSuccess',
+    component: () => import('../views/Success.vue') 
+  },
+  {
+    path: '/donate-goods',
+    name: 'DonateGoods',
+    component: () => import('../views/DonateGoods.vue')
+  },
+  {
+    path: '/forgot-password',
+    name: 'forgot-password',
+    component: ForgotPassword,
+  },
+  {
+    path: '/reset-password/:uid/:token',
+    name: 'reset-password',
+    component: ResetPassword,
+    props: true
+  },
+   {
+    path: '/donate-modal',
+    name: 'donate-modal',
+    component: DonateModal,
+  },
+   {
+    path: '/inkind-modal',
+    name: 'Inkind-modal',
+    component: InKindDonateModal,
+  },
+  {
+    path: '/createDonation',
+    name: 'createDonation',
+    component: CreateDonationModal,
+  },
+  {
+  path: '/my-applications',
+  name: 'MyApplications',
+  component: () => import('../views/MyApplication.vue'),
+  meta: { requiresAuth: true }
+},
+{
+  path: '/profile',
+  name: 'Profile',
+  component: () => import('../views/Profile.vue'),
+  meta: { requiresAuth: true }
+}
+
 ]
 
 
@@ -62,14 +119,14 @@ const router = createRouter({
   routes
 })
 
-// 🔹 ✅ Protect routes that require authentication
+// Protect routes that require authentication
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = !!localStorage.getItem('access_token')  // ✅ Check if token exists
+  const isAuthenticated = !!localStorage.getItem('access_token')  // Check if token exists
 
   if (to.meta.requiresAuth && !isAuthenticated) {
-    next('/login')  // 🚀 Redirect to login if not authenticated
+    next('/login')  // Redirect to login if not authenticated
   } else {
-    next()  // ✅ Proceed to the route
+    next()  // Proceed to the route
   }
 })
 

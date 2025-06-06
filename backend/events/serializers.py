@@ -15,6 +15,8 @@ class EventSerializer(serializers.ModelSerializer):
             'date',
             'location',
             'category',
+            'latitude',  
+            'longitude',
             'created_by',
             'attendees',
             'attendee_count',

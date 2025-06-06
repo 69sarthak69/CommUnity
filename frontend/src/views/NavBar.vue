@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router'
 
 const user = ref<{ email: string; username: string } | null>(null)
 const router = useRouter()
-// ✅ Function to check logged-in user from localStorage
+// Function to check logged-in user from localStorage
 const checkUser = () => {
   const storedEmail = localStorage.getItem('user_email')
   const storedUsername = localStorage.getItem('user_username')
@@ -16,53 +16,53 @@ const checkUser = () => {
     user.value = null
   }
 }
-// ✅ Watch for user login changes
+// Watch for user login changes
 window.addEventListener('userLoggedIn', checkUser)
 watchEffect(() => {
   checkUser()
 })
 
-// ✅ Fetch help requests when component mounts
+// Fetch help requests when component mounts
 onMounted(() => {
   checkUser()
 })
 
-// ✅ Logout function
+// Logout function
 const handleLogout = () => {
   localStorage.removeItem('access_token')
   localStorage.removeItem('user_email')
   localStorage.removeItem('user_username')
   user.value = null
-  router.push('/login')
+  router.push('/')
 }
 </script>
 <template>
- <!-- ✅ Top Navigation Bar -->
+ <!-- Top Navigation Bar -->
  <div class="nav-container">
     <div class="container nav-content">
       <router-link to="/home" class="logo">Community Help</router-link>
 
       <div class="nav-links">
-        <!-- ✅ Notification Bell Icon -->
+        <!-- Notification Bell Icon -->
         <Notifications />
 
-        <!-- ✅ Show Profile when user is logged in -->
+        <!-- Show Profile when user is logged in -->
         <button class="button-secondary" @click="router.push('/profile')" v-if="user">
           👤 {{ user?.email }}
         </button>
 
-        <!-- ✅ Show Logout only when user is logged in -->
+        <!-- Show Logout only when user is logged in -->
         <button class="button-secondary" @click="handleLogout" v-if="user">
           🚪 Logout
         </button>
 
-        <!-- ✅ Show Chat button only when user is logged in -->
+        <!-- Show Chat button only when user is logged in -->
         <button class="button-secondary" @click="router.push('/chatbox')" v-if="user">
           💬 Chat
         </button>
 
-        <!-- ❌ Hide Login when user is logged in -->
-        <router-link to="/login" class="button-primary" v-if="!user">
+        <!-- Hide Login when user is logged in -->
+        <router-link to="/" class="button-primary" v-if="!user">
           Login
         </router-link>
       </div>

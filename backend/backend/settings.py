@@ -2,27 +2,30 @@ import os
 import environ
 from pathlib import Path
 from datetime import timedelta
+from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Initialize environment variables
+# Load environment variables from .env file
 env = environ.Env()
-env.read_env(os.path.join(BASE_DIR, '.env'))  # Explicitly load .env file
+env.read_env(os.path.join(BASE_DIR, '.env')) 
 
-# Database connection using DATABASE_URL
+# PostgreSQL database configuration using DATABASE_URL
 DATABASES = {
     'default': env.db('DATABASE_URL', default='postgres://postgres:admin@localhost:5432/community_platform')
 }
 
-# Secret key
+# Secret key for cryptographic signing
 SECRET_KEY = env('SECRET_KEY', default='fallback-secret-key')
 
-# Quick-start development settings - unsuitable for production
 DEBUG = True
 ALLOWED_HOSTS = []
 
-# Application definition
+# Installed apps for Django and third-party support
 INSTALLED_APPS = [
+    'dal',
+    'dal_select2',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,12 +43,15 @@ INSTALLED_APPS = [
     'channels',
     'chat',
     'donation',
+    'django_rest_passwordreset',
     
 ]
+# Khalti payment keys from .env
+KHALTI_SECRET_KEY = config("KHALTI_SECRET_KEY")
+KHALTI_PUBLIC_KEY = config("KHALTI_PUBLIC_KEY")
 
-KHALTI_SECRET_KEY = "test_secret_key_18d538e7c1de4a528b974a05a6548a04"
-
-MIDDLEWARE = [
+# Middleware configuration
+MIDDLEWARE = [                                                                              
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -62,7 +68,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            BASE_DIR / 'templates',  # This is for your Django templates, not Vue.js
+            BASE_DIR / 'templates',  
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -103,7 +109,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
 
-# Add the path to your Vue.js dist folder and other static assets
+# Vue.js dist folder and other static assets
 STATICFILES_DIRS = [
     "C:/Users/Sarthak Shrestha/Desktop/FYP_COMMUNITY_PLATFORM/frontend/dist/assets",
 ]
@@ -135,9 +141,13 @@ REST_FRAMEWORK = {
 # Custom User Model
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
-CORS_ALLOW_ALL_ORIGINS = False
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",  # Vue dev server
+]
+
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Your Vue.js frontend
+    "http://localhost:5173",  # Vue.js frontend
 ]
 
 AUTHENTICATION_BACKENDS = [
@@ -150,7 +160,7 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,  # Generates a new refresh token on refresh
     'BLACKLIST_AFTER_ROTATION': True,  # Blacklist old refresh tokens after refresh
     'ALGORITHM': 'HS256',  # Hashing algorithm
-    'SIGNING_KEY': SECRET_KEY,  # Uses your Django secret key
+    'SIGNING_KEY': SECRET_KEY,  # Django secret key
     'AUTH_HEADER_TYPES': ('Bearer',),  # Must use 'Bearer <token>' in requests
 }
 
@@ -168,3 +178,13 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'shresthasarthak666@gmail.com'  
+EMAIL_HOST_PASSWORD = 'gqlpmldtqefmperd' 
+DEFAULT_FROM_EMAIL = 'CommunityHelp <shresthasarthak666@gmail.com>'
+
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

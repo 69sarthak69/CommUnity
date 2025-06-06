@@ -7,7 +7,7 @@ from .models import Event
 from .serializers import EventSerializer
 from chat.models import Room 
 
-# ✅ List + Create Events
+# List + Create Events
 class EventListCreateView(generics.ListCreateAPIView):
     queryset = Event.objects.all().order_by('date')
     serializer_class = EventSerializer
@@ -15,13 +15,13 @@ class EventListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         event = serializer.save(created_by=self.request.user)
-        event.attendees.add(self.request.user)  # ✅ Auto-join creator
+        event.attendees.add(self.request.user)  # Auto-join creator
         room_name = f"event_{event.id}"
         Room.objects.get_or_create(name=room_name)
 
 
 
-# ✅ Get event detail
+# Get event detail
 @api_view(['GET'])
 @permission_classes([IsAuthenticatedOrReadOnly])
 def event_detail(request, event_id):
@@ -34,8 +34,7 @@ def event_detail(request, event_id):
     return Response(serializer.data)
 
 
-# ✅ RSVP (Join) Event
-# ✅ RSVP (Join) Event
+# RSVP (Join) Event
 class EventJoinView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -45,15 +44,15 @@ class EventJoinView(APIView):
         except Event.DoesNotExist:
             return Response({'error': 'Event not found'}, status=404)
 
-        if request.user in event.attendees.all():  # ✅ fix: use attendees not members
+        if request.user in event.attendees.all():  
             return Response({'message': 'Already joined'}, status=200)
 
-        event.attendees.add(request.user)  # ✅ fix: use attendees
+        event.attendees.add(request.user)  
         return Response({'message': 'Joined event successfully'}, status=200)
 
 
 
-# ✅ Cancel RSVP
+# Cancel RSVP
 class CancelRSVPView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -70,7 +69,7 @@ class CancelRSVPView(APIView):
         return Response({'message': 'You were not attending'}, status=400)
 
 
-# ✅ Update/Delete (Only by creator)
+# Update/Delete (Only by creator)
 class EventUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer

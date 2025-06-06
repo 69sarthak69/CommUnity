@@ -2,16 +2,18 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.text import slugify
 
+
+# Custom user model extending Django's AbstractUser
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True) 
     phone_number = models.CharField(max_length=15, unique=True, null=True, blank=True)
     location = models.CharField(max_length=255, null=True, blank=True)
     area_of_interest = models.CharField(max_length=100, null=True, blank=True)
-    first_name = models.CharField(max_length=50, blank=False, null=False)  # ✅ Required First Name
-    last_name = models.CharField(max_length=50, blank=False, null=False)  # ✅ Required Last Name
+    first_name = models.CharField(max_length=50, blank=False, null=False)  #  Required First Name
+    last_name = models.CharField(max_length=50, blank=False, null=False)  #  Required Last Name
 
-    USERNAME_FIELD = 'email'  # ✅ Use email for authentication
-    REQUIRED_FIELDS = ['first_name', 'last_name']  # ✅ Required during registration
+    USERNAME_FIELD = 'email'  # Use email for authentication
+    REQUIRED_FIELDS = ['first_name', 'last_name']  # Required during registration
 
     def save(self, *args, **kwargs):
         """ Auto-generate a unique username based on first_name and last_name """
@@ -30,4 +32,4 @@ class CustomUser(AbstractUser):
         super().save(*args, **kwargs)  # Call parent save method
 
     def __str__(self):
-        return self.email  # ✅ Use email as the string representation
+        return self.email  # Display email as user identifier

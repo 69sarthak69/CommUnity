@@ -4,6 +4,8 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import CustomUser
 
+
+# Serializer for user registration
 class RegisterSerializer(serializers.ModelSerializer):
     phone_number = serializers.CharField(required=True, max_length=15)
     location = serializers.CharField(required=True, max_length=255)
@@ -22,14 +24,14 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Create and return a new user"""
-        username = f"{validated_data['first_name'].lower()}_{validated_data['last_name'].lower()}"  # ✅ Generate username
+        username = f"{validated_data['first_name'].lower()}_{validated_data['last_name'].lower()}"  #  Generate username
 
         user = CustomUser.objects.create_user(
             username=username,
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
             email=validated_data['email'],
-            password=validated_data['password'],  # ✅ No need to call `set_password`
+            password=validated_data['password'], 
             phone_number=validated_data.get('phone_number', ''),
             location=validated_data.get('location', ''),
             area_of_interest=validated_data.get('area_of_interest', '')
@@ -37,11 +39,13 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
+# Serializer for user login
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
     def validate(self, data):
+        # Authenticate user based on email and password
         email = data['email']
         password = data['password']
 
@@ -49,4 +53,4 @@ class LoginSerializer(serializers.Serializer):
         if not user or not user.check_password(password):
             raise serializers.ValidationError({"non_field_errors": ["Invalid email or password"]})
 
-        return {"user": user}  # ✅ Return wrapped user
+        return {"user": user}  

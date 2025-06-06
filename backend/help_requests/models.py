@@ -5,11 +5,12 @@ from django.conf import settings
 class HelpRequest(models.Model):
     """Model for user help requests"""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    # user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="help_requests")
     title = models.CharField(max_length=255)
     description = models.TextField()
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     applicants = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='applied_requests', blank=True)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
     
     CATEGORY_CHOICES = [
         ("food", "Food"),
@@ -81,16 +82,31 @@ class CommunityPost(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.user.email})"
+    
+
+class HelpApplication(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    help_request = models.ForeignKey(HelpRequest, on_delete=models.CASCADE, related_name="applications")
+    letter = models.TextField(blank=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')  
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'help_request')
+
+    def __str__(self):
+        return f"{self.user.email} applied to {self.help_request.title}"
 
 
-# class Notification(models.Model):
-#     """Model for notifications"""
-#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-#     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications")
-#     request = models.ForeignKey(HelpRequest, on_delete=models.CASCADE, related_name="notifications", null=True, blank=True)
-#     message = models.TextField()
-#     is_read = models.BooleanField(default=False)
-#     created_at = models.DateTimeField(auto_now_add=True)
-
-#     def __str__(self):
-#         return f"Notification for {self.user}"
+class Comment(models.Model):
+    post = models.ForeignKey(CommunityPost, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='replies')
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)

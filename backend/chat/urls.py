@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import RoomMessageListView
-
+from .views import MessageListAPIView
 urlpatterns = [
-    path('messages/<str:room_name>/', RoomMessageListView.as_view(), name='room-messages'),
+    path('messages/<str:room_name>/', MessageListAPIView.as_view()),
+
 ]

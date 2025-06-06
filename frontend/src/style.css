@@ -475,6 +475,8 @@ body {
   justify-content: space-between;
   align-items: center;
 }
+
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .main-content {
@@ -625,4 +627,7 @@ body {
     font-size: 0.9rem;
     color: #666;
     margin-bottom: 0.5rem;
+  }
+  .sidebar {
+    width: 280px; /* or even 300px */
   }

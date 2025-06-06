@@ -13,7 +13,7 @@ class RoomMessageListView(APIView):
         except Room.DoesNotExist:
             return Response({"error": "Room not found"}, status=404)
 
-        # ✅ STEP 6: Restrict based on room type
+        # Restrict based on room type
         if room_name.startswith("group_"):
             group_id = room_name.split("_")[1]
             if not request.user.joined_groups.filter(id=group_id).exists():
@@ -24,7 +24,7 @@ class RoomMessageListView(APIView):
             if not request.user.attending_events.filter(id=event_id).exists():
                 return Response({"error": "You are not attending this event"}, status=403)
 
-        # ✅ If passed, fetch messages
+        #  If passed, fetch messages
         messages = Message.objects.filter(room=room).order_by("timestamp")
         serializer = MessageSerializer(messages, many=True)
         return Response(serializer.data)
@@ -61,3 +61,16 @@ def send_message(request):
     msg = Message.objects.create(room=room, sender=request.user, content=message)
     serializer = MessageSerializer(msg)
     return Response(serializer.data, status=201)
+
+
+
+from rest_framework.generics import ListAPIView
+from .models import Message
+from .serializers import MessageSerializer
+
+class MessageListAPIView(ListAPIView):
+    serializer_class = MessageSerializer
+
+    def get_queryset(self):
+        room_name = self.kwargs['room_name']
+        return Message.objects.filter(room__name=room_name).order_by('timestamp')

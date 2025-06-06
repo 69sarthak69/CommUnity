@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Application Approved</title>
+</head>
+<body>
+    <h2>Congratulations, {{ user.username }}!</h2>
+    <p>Your application to help with <strong>{{ help_request.title }}</strong> has been <span style="color:green;">approved</span>!</p>
+    <p><b>Task Details:</b></p>
+    <p>{{ help_request.description }}</p>
+    <p>Location: {{ help_request.location }}</p>
+    <hr>
+    <p>Thank you for supporting your community.</p>
+    <small>This is an automated message from CommunityHelp.</small>
+</body>
+</html>
