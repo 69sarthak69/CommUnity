@@ -16,7 +16,7 @@ const props = defineProps({
   title: String,
 })
 
-const apiKey = 'AIzaSyAS7aBWvCP0nj1SlYs-H-grA1Zs35TE4QE' 
+// const apiKey = 'your api key' 
 
 onMounted(async () => {
   if (!props.latitude || !props.longitude) return
